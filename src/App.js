@@ -1,24 +1,24 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+//демонстрация возможностей импорта функций
+import Total /*имя может быть любым, без фигурных скобок т.к export default*/ from './components/total/Total';
+import {History} /*имя строго, фигурные скобки, т.к export default*/ from './components/history/History';
+import Operations /*имя может быть любым, без фигурных скобок, т.к export default*/ from './components/operation/Operation';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+    <>
+      <header>
+        <h1>Кошелек</h1>
+        <h2>Калькулятор расходов</h2>
       </header>
-    </div>
+      <main>
+          <div className="container">
+              <Total/>
+              <History/>
+              <Operations/>
+          </div>
+      </main>
+    </>
   );
 }
 

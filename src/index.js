@@ -1,3 +1,4 @@
+/*React - это фронт, после билда он превращается в обычный js файл*/
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';

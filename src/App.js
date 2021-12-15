@@ -7,12 +7,20 @@ import Operations /*имя может быть любым, без фигурны
 class App extends Component { //классы позволяют хранить состояния
 
   state = {
-    transactions: [],
+    transactions: JSON.parse(localStorage.getItem("calcMoney")) || [],
     description: '',
     moneyAmount: '',
     totalIncome: 0, 
     totalExpenses: 0, 
     totalBalance: 0,
+  }
+
+  componentWillMount() { //componentWillMount вызывает функцию прямо перед началом рендеринга
+    this.getTotalBalance();
+  } 
+
+  componentDidUpdate() {
+    this.addToStorage(); //каждый раз, когда обновляется компонент, транзакции добавляются в локальное хранилище
   }
 
   //этот метод мы передаем в Operation
@@ -26,11 +34,11 @@ class App extends Component { //классы позволяют хранить �
       add
     });
 
-    this.setState({
+    this.setState({ //почему везде пишется this? потому что эти функции и объекты находятся в одном классе (App)
       transactions, 
       description: '', 
       moneyAmount: '',
-    }, this.getTotalBalance);
+    }, this.getTotalBalance)
   }
 
   addAmount = e => { //это асинхронная функция
@@ -68,6 +76,17 @@ class App extends Component { //классы позволяют хранить �
   }
 
 
+  //Local Storage
+  addToStorage() {
+    localStorage.setItem("calcMoney", JSON.stringify(this.state.transactions));
+  }
+
+  deleteTransaction = id => {
+    //фильтруются только те элементы, у которых ключи не совпадают с тем который мы собираемся удалить
+    const transactions = this.state.transactions.filter(item => item.id !== id);
+    this.setState({transactions}, this.getTotalBalance);
+  }
+
   render() {
     return (
       /*эти треугольные скобки могут быть пустыми, т.к по умолчанию и так стоит React.Fragment*/
@@ -83,7 +102,10 @@ class App extends Component { //классы позволяют хранить �
                   totalExpenses = {this.state.totalExpenses}
                   totalBalance = {this.state.totalBalance}
                 />
-                <History transactions = {this.state.transactions}/>
+                <History 
+                  transactions = {this.state.transactions}
+                  deleteTransaction = {this.deleteTransaction}
+                />
                 <Operations 
                   addTransaction={this.addTransaction}
                   addDescription={this.addDescription}

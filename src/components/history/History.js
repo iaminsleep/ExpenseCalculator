@@ -1,7 +1,7 @@
 import React from 'react';
 import HistoryItem from './HistoryItem';
 
-export const History = ({transactions}) => {
+export const History = ({transactions, deleteTransaction}) => {
   return(
     <section className="history">
         <h3>История расходов</h3>
@@ -10,6 +10,7 @@ export const History = ({transactions}) => {
               <HistoryItem 
                 key={item.id}
                 transaction={item}
+                deleteTransaction={deleteTransaction}
               />)}
         </ul>
     </section>

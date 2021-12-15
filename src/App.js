@@ -6,31 +6,31 @@ import Operations /*имя может быть любым, без фигурны
 
 class App extends Component { //классы позволяют хранить состояния
 
-  constructor(props) { //здесь хранятся состояния
-    super(props);
-    this.state = {
-      transactions: [],
-      description: '',
-      moneyAmount: '',
-    }
-    this.addAmount = this.addAmount.bind(this); //решение проблемы с setState undefined
+  state = {
+    transactions: [],
+    description: '',
+    moneyAmount: '',
   }
 
   //именно этот метод мы передаем в Operation
-  addTransaction(add) {
-    const transaction = {
+  addTransaction = add => {
+    const transactions = [...this.state.transactions]; //... - spread-оператор
+
+    transactions.push({ //пушим новую транзакцию
       id: `cmr${(+new Date).toString(16)}key`, //+ перед new Date нужен чтобы дата сразу переводилась в число. 16 переводит число в шестнадцатеричную систему
       description: this.state.description,
       moneyAmount: this.state.moneyAmount,
       add
-    }
+    });
+
+    this.setState({transactions, description: '', moneyAmount: ''}, () => console.log(this.state));
   }
 
-  addAmount(e) { //это асинхронная функция
-    this.setState({moneyAmount: e.target.value}, /*далее идёт callback-функция(действие после)*/ ()=>{console.log(this.state)}) 
+  addAmount = e => { //это асинхронная функция
+    this.setState({moneyAmount: e.target.value}) 
   }
 
-  addDescription(e) { //это асинхронная функция
+  addDescription = e => { //это асинхронная функция
     this.setState({description: e.target.value}) 
   }
 
@@ -45,10 +45,13 @@ class App extends Component { //классы позволяют хранить �
         <main>
             <div className="container">
                 <Total/>
-                <History/>
+                <History transactions = {this.state.transactions}/>
                 <Operations 
                   addTransaction={this.addTransaction}
+                  addDescription={this.addDescription}
                   addAmount={this.addAmount}
+                  description={this.state.description}
+                  moneyAmount={this.state.moneyAmount}
                 />
             </div>
         </main>

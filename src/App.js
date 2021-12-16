@@ -20,10 +20,6 @@ class App extends Component { //классы позволяют хранить �
     isSignedIn: JSON.parse(localStorage.getItem("expcalc:issignedin")),
   }
 
-  signOut() {
-    firebase.auth().signOut();
-  }
-
   componentWillMount() { //componentWillMount вызывает функцию прямо перед началом рендеринга
     this.getTotalBalance();
   } 
@@ -83,10 +79,16 @@ class App extends Component { //классы позволяют хранить �
     });
   }
 
-
   //Local Storage
   addToStorage() {
     localStorage.setItem("calcMoney", JSON.stringify(this.state.transactions));
+  }
+
+  signOut = () => {
+    this.setState({
+      isSignedIn: false,
+    }, () => firebase.auth().signOut())
+    localStorage.setItem("expcalc:issignedin", "false");
   }
 
   deleteTransaction = id => {
@@ -96,7 +98,7 @@ class App extends Component { //классы позволяют хранить �
   }
 
   render() {
-    if(this.state.isSignedIn == true) {
+    if(this.state.isSignedIn === true) {
       return (
         /*эти треугольные скобки могут быть пустыми, т.к по умолчанию и так стоит React.Fragment*/
         <React.Fragment> 

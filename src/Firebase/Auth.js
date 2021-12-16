@@ -18,9 +18,8 @@ const Auth = ({App}) => {
         currentUser.accessToken = resToken;
         
         firebase.database().ref("users").set({currentUser}).catch(alert);
-        checkIfSignedIn();
-
         localStorage.setItem("expcalc:token", resToken);
+        checkIfSignedIn();
       })
       .catch((err) => {
         console.log(err);
@@ -47,7 +46,6 @@ const Auth = ({App}) => {
   return (
     <button onClick={SignInWithFirebase}>Войти</button>
   )
-
 }
 
 export default Auth;

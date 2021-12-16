@@ -1,11 +1,14 @@
 import React, {Component} from 'react';
-//демонстрация возможностей импорта функций
 import Total /*имя может быть любым, без фигурных скобок т.к export default*/ from './components/total/Total';
-import {History} /*имя строго, фигурные скобки, т.к export default*/ from './components/history/History';
-import Operations /*имя может быть любым, без фигурных скобок, т.к export default*/ from './components/operation/Operation';
+import {History} /*имя строго, фигурные скобки, т.к НЕ export default*/ from './components/history/History';
+import Operations from './components/operation/Operation';
+import SignIn from './Firebase/SignIn';
+
+import firebase from './Firebase/firebase-config'
 
 class App extends Component { //классы позволяют хранить состояния
-
+  
+  //состояние траназкций
   state = {
     transactions: JSON.parse(localStorage.getItem("calcMoney")) || [],
     description: '',
@@ -13,6 +16,11 @@ class App extends Component { //классы позволяют хранить �
     totalIncome: 0, 
     totalExpenses: 0, 
     totalBalance: 0,
+    isSignedIn: false,
+  }
+
+  signOut() {
+    firebase.auth().signOut();
   }
 
   componentWillMount() { //componentWillMount вызывает функцию прямо перед началом рендеринга
@@ -72,7 +80,7 @@ class App extends Component { //классы позволяют хранить �
       totalIncome,
       totalExpenses,
       totalBalance,
-    }, () => console.log(this.state));
+    });
   }
 
 
@@ -88,35 +96,49 @@ class App extends Component { //классы позволяют хранить �
   }
 
   render() {
-    return (
-      /*эти треугольные скобки могут быть пустыми, т.к по умолчанию и так стоит React.Fragment*/
-      <React.Fragment> 
-        <header>
-          <h1>Кошелек</h1>
-          <h2>Калькулятор расходов</h2>
-        </header>
-        <main>
-            <div className="container">
-                <Total 
-                  totalIncome = {this.state.totalIncome}
-                  totalExpenses = {this.state.totalExpenses}
-                  totalBalance = {this.state.totalBalance}
-                />
-                <History 
-                  transactions = {this.state.transactions}
-                  deleteTransaction = {this.deleteTransaction}
-                />
-                <Operations 
-                  addTransaction={this.addTransaction}
-                  addDescription={this.addDescription}
-                  addAmount={this.addAmount}
-                  description={this.state.description}
-                  moneyAmount={this.state.moneyAmount}
-                />
-            </div>
-        </main>
-      </React.Fragment>
-    );
+    if(this.state.isSignedIn === true) {
+      return (
+        /*эти треугольные скобки могут быть пустыми, т.к по умолчанию и так стоит React.Fragment*/
+        <React.Fragment> 
+          <header>
+            <h1>Кошелек</h1>
+            <h2>Калькулятор расходов</h2>
+          </header>
+          <main>
+              <div className="container">
+                  <Total 
+                    totalIncome = {this.state.totalIncome}
+                    totalExpenses = {this.state.totalExpenses}
+                    totalBalance = {this.state.totalBalance}
+                  />
+                  <History 
+                    transactions = {this.state.transactions}
+                    deleteTransaction = {this.deleteTransaction}
+                  />
+                  <Operations 
+                    addTransaction={this.addTransaction}
+                    addDescription={this.addDescription}
+                    addAmount={this.addAmount}
+                    description={this.state.description}
+                    moneyAmount={this.state.moneyAmount}
+                  />
+                  <button onClick={this.signOut}>Выйти</button>
+              </div>
+          </main>
+        </React.Fragment>
+      );
+    }
+    else {
+      return(
+        <React.Fragment> 
+          <header>
+            <h1>Кошелек</h1>
+            <h2>Калькулятор расходов</h2>
+          </header>
+          <SignIn App={this}/> 
+        </React.Fragment>
+      )
+    }
   }
 }
 

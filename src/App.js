@@ -2,9 +2,10 @@ import React, {Component} from 'react';
 import Total /*имя может быть любым, без фигурных скобок т.к export default*/ from './components/total/Total';
 import {History} /*имя строго, фигурные скобки, т.к НЕ export default*/ from './components/history/History';
 import Operations from './components/operation/Operation';
-import SignIn from './Firebase/SignIn';
 
 import firebase from './Firebase/firebase-config'
+import Auth from './Firebase/Auth';
+
 
 class App extends Component { //классы позволяют хранить состояния
   
@@ -16,7 +17,7 @@ class App extends Component { //классы позволяют хранить �
     totalIncome: 0, 
     totalExpenses: 0, 
     totalBalance: 0,
-    isSignedIn: false,
+    isSignedIn: JSON.parse(localStorage.getItem("expcalc:issignedin")),
   }
 
   signOut() {
@@ -57,7 +58,6 @@ class App extends Component { //классы позволяют хранить �
     this.setState({description: e.target.value}) 
   }
 
-
   getIncome() {
     return this.state.transactions
     .filter(item => item.add)
@@ -96,7 +96,7 @@ class App extends Component { //классы позволяют хранить �
   }
 
   render() {
-    if(this.state.isSignedIn === true) {
+    if(this.state.isSignedIn == true) {
       return (
         /*эти треугольные скобки могут быть пустыми, т.к по умолчанию и так стоит React.Fragment*/
         <React.Fragment> 
@@ -135,7 +135,7 @@ class App extends Component { //классы позволяют хранить �
             <h1>Кошелек</h1>
             <h2>Калькулятор расходов</h2>
           </header>
-          <SignIn App={this}/> 
+          <Auth App={this}/> 
         </React.Fragment>
       )
     }

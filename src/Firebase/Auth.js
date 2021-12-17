@@ -1,9 +1,9 @@
 import React from 'react';
-import firebase from './firebase-config';
+import firebase, {dbUsers}  from './firebase-config';
 
 const Auth = ({App}) => {
 
-  let currentUser = {
+  let userInfo = {
     username: '',
     accessToken: '',
   };
@@ -13,13 +13,14 @@ const Auth = ({App}) => {
       .then(res => {
 
         const resUsername = res.additionalUserInfo.username;
-        const resToken = res.user.multiFactor.user.accessToken;
-        currentUser.username = resUsername;
-        currentUser.accessToken = resToken;
+        const resToken = res.user.multiFactor.user.uid;
+        userInfo.username = resUsername;
+        userInfo.accessToken = resToken;
         
-        firebase.database().ref("users").set({currentUser}).catch(alert);
-        localStorage.setItem("expcalc:token", resToken);
+        checkIfUserExists(resToken);     
         checkIfSignedIn();
+
+        localStorage.setItem("expcalc:token", resToken);
       })
       .catch((err) => {
         console.log(err);
@@ -39,6 +40,19 @@ const Auth = ({App}) => {
           isSignedIn: false,
         });
         localStorage.setItem("expcalc:issignedin", "false");
+      }
+    });
+  }
+
+  function checkIfUserExists(valueToCheck) {
+    dbUsers.orderByChild("userInfo/accessToken").equalTo(valueToCheck)
+      .once('value').then(snapshot => {
+      if(snapshot.exists()) {
+        console.log('Пользователь найден в системе')
+      }
+      else {
+        dbUsers.push({userInfo}).catch(alert);
+        console.log('Добавление нового пользователя')
       }
     });
   }

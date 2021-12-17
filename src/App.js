@@ -65,7 +65,7 @@ class App extends Component { //классы позволяют хранить �
 
    //другой вариант со стрелочной функции(return не нужен) и сокращением числа итераций(функциональность та же)
   getExpenses = () => this.state.transactions
-  .reduce((acc, item) => !item.add ? item.moneyAmount + acc : acc, 0);
+    .reduce((acc, item) => !item.add ? item.moneyAmount + acc : acc, 0);
 
   getTotalBalance() {
     const totalIncome = this.getIncome();

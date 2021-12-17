@@ -5,7 +5,7 @@ const Auth = ({App}) => {
 
   let userInfo = {
     username: '',
-    accessToken: '',
+    uid: '',
   };
 
   const SignInWithFirebase = () => {
@@ -13,14 +13,13 @@ const Auth = ({App}) => {
       .then(res => {
 
         const resUsername = res.additionalUserInfo.username;
-        const resToken = res.user.multiFactor.user.uid;
+        const resID = res.user.multiFactor.user.uid;
         userInfo.username = resUsername;
-        userInfo.accessToken = resToken;
+        userInfo.uid = resID;
         
         checkIfUserExists(resToken);     
         checkIfSignedIn();
 
-        localStorage.setItem("expcalc:token", resToken);
       })
       .catch((err) => {
         console.log(err);
@@ -48,11 +47,11 @@ const Auth = ({App}) => {
     dbUsers.orderByChild("userInfo/accessToken").equalTo(valueToCheck)
       .once('value').then(snapshot => {
       if(snapshot.exists()) {
-        console.log('Пользователь найден в системе')
+        console.log('Пользователь найден в системе');
       }
       else {
         dbUsers.push({userInfo}).catch(alert);
-        console.log('Добавление нового пользователя')
+        console.log('Добавлен новый пользователь');
       }
     });
   }

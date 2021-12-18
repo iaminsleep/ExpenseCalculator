@@ -5,13 +5,14 @@ import Operations from './components/operation/Operation';
 
 import firebase from './Firebase/firebase-config'
 import Auth from './Firebase/Auth';
+import {db} from './Firebase/firebase-config';
 
 
 class App extends Component { //классы позволяют хранить состояния
   
   //состояние траназкций
   state = {
-    transactions: JSON.parse(localStorage.getItem("calcMoney")) || [],
+    transactions: [],
     description: '',
     moneyAmount: '',
     totalIncome: 0, 
@@ -20,19 +21,26 @@ class App extends Component { //классы позволяют хранить �
     isSignedIn: JSON.parse(localStorage.getItem("expcalc:issignedin")),
   }
 
-  componentWillMount() { //componentWillMount вызывает функцию прямо перед началом рендеринга
-    this.getTotalBalance();
+  componentDidMount() { //componentDidMount вызывает функцию прямо перед началом рендеринга
+    this.getTransactions(JSON.parse(localStorage.getItem("expcalc:currentuid")));
   } 
 
-  componentDidUpdate() {
-    this.addToStorage(); //каждый раз, когда обновляется компонент, транзакции добавляются в локальное хранилище
+  getTransactions(id) {
+    const userRef = db.ref("users").child("user"+id);
+    userRef.once('value', snapshot => {
+        this.setState({
+          transactions: snapshot.val().transactions,
+        }, () => this.getTotalBalance()) /* callback-функция (выполняется после setState) */
+    });
   }
 
   //этот метод мы передаем в Operation
   addTransaction = add => {
+    let currentUID = JSON.parse(localStorage.getItem("expcalc:currentuid"));
     const transactions = [...this.state.transactions]; //... - spread-оператор
 
     transactions.push({ //пушим новую транзакцию
+      userId: currentUID,
       id: `cmr${(+new Date()).toString(16)}key`, //+ перед new Date нужен чтобы дата сразу переводилась в число. 16 переводит число в шестнадцатеричную систему
       description: this.state.description,
       moneyAmount: this.state.moneyAmount,
@@ -43,7 +51,10 @@ class App extends Component { //классы позволяют хранить �
       transactions, 
       description: '', 
       moneyAmount: '',
-    }, this.getTotalBalance)
+    }, () => {
+      this.addToStorage(currentUID);
+      this.getTotalBalance();
+    })
   }
 
   addAmount = e => { //это асинхронная функция
@@ -56,11 +67,8 @@ class App extends Component { //классы позволяют хранить �
 
   getIncome() {
     return this.state.transactions
-    .filter(item => item.add)
-    .reduce((acc, item) => item.moneyAmount + acc, 0) 
-    //reduce собирает данные, аккумулирует их. 
-    //0 - значение аккумулятора по дефолту
-    //если filter возвращает массив, то reduce возвращает число
+    .filter(item => item.add) //если filter возвращает массив, то reduce возвращает число
+    .reduce((acc, item) => item.moneyAmount + acc, 0) //reduce собирает данные, аккумулирует их. 0 - значение аккумулятора по дефолту
   }
 
    //другой вариант со стрелочной функции(return не нужен) и сокращением числа итераций(функциональность та же)
@@ -79,9 +87,20 @@ class App extends Component { //классы позволяют хранить �
     });
   }
 
-  //Local Storage
-  addToStorage() {
-    localStorage.setItem("calcMoney", JSON.stringify(this.state.transactions));
+  //Storage
+  addToStorage(id) {
+    const transactions = this.state.transactions;
+
+    db.ref("users").orderByChild("userInfo/uid").equalTo(id).once('value').then(snapshot => {
+      if(snapshot.exists()) {
+        const userRef = db.ref("users").child("user"+id);
+
+        userRef.child("transactions").set(transactions);  
+      }
+      else {
+        console.error('error')
+      }
+    })
   }
 
   signOut = () => {

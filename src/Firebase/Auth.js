@@ -1,5 +1,6 @@
 import React from 'react';
-import firebase, {dbUsers}  from './firebase-config';
+import firebase, {db}  from './firebase-config';
+
 
 const Auth = ({App}) => {
 
@@ -16,8 +17,10 @@ const Auth = ({App}) => {
         const resID = res.user.multiFactor.user.uid;
         userInfo.username = resUsername;
         userInfo.uid = resID;
+
+        checkIfUserExists(resID);    
+        localStorage.setItem("expcalc:currentuid", JSON.stringify(resID));
         
-        checkIfUserExists(resToken);     
         checkIfSignedIn();
 
       })
@@ -43,15 +46,15 @@ const Auth = ({App}) => {
     });
   }
 
-  function checkIfUserExists(valueToCheck) {
-    dbUsers.orderByChild("userInfo/accessToken").equalTo(valueToCheck)
-      .once('value').then(snapshot => {
+  function checkIfUserExists(id) {
+    db.ref("users/").orderByChild("userInfo/uid").equalTo(id).once('value').then(snapshot => {
       if(snapshot.exists()) {
         console.log('Пользователь найден в системе');
+        db.ref("users").child("user"+id).update({userInfo}).catch(alert);
       }
       else {
-        dbUsers.push({userInfo}).catch(alert);
         console.log('Добавлен новый пользователь');
+        db.ref("users").child("user"+id).set({userInfo}).catch(alert);
       }
     });
   }
@@ -61,4 +64,4 @@ const Auth = ({App}) => {
   )
 }
 
-export default Auth;
+export default Auth; 

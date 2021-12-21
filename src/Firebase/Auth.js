@@ -7,6 +7,7 @@ const Auth = ({App}) => {
   let userInfo = {
     username: '',
     uid: '',
+    access_token: '',
   };
 
   const SignInWithFirebase = () => {
@@ -15,14 +16,16 @@ const Auth = ({App}) => {
 
         const resUsername = res.additionalUserInfo.username;
         const resID = res.user.multiFactor.user.uid;
+        const accessToken = res.user._delegate.accessToken;
+
         userInfo.username = resUsername;
         userInfo.uid = resID;
+        userInfo.access_token = accessToken;
 
-        checkIfUserExists(resID);    
-        localStorage.setItem("expcalc:currentuid", JSON.stringify(resID));
+        checkIfUserExists(resID, accessToken);    
+        App.setState({userId: resID});
         
         checkIfSignedIn();
-
       })
       .catch((err) => {
         console.log(err);
@@ -46,15 +49,17 @@ const Auth = ({App}) => {
     });
   }
 
-  function checkIfUserExists(id) {
+  function checkIfUserExists(id, accessToken) {
     db.ref("users/").orderByChild("userInfo/uid").equalTo(id).once('value').then(snapshot => {
       if(snapshot.exists()) {
         console.log('Пользователь найден в системе');
         db.ref("users").child("user"+id).update({userInfo}).catch(alert);
+        localStorage.setItem("expcalc:access_token", JSON.stringify(accessToken));
       }
       else {
         console.log('Добавлен новый пользователь');
         db.ref("users").child("user"+id).set({userInfo}).catch(alert);
+        localStorage.setItem("expcalc:access_token", JSON.stringify(accessToken));
       }
     });
   }

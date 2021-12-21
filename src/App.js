@@ -19,12 +19,28 @@ class App extends Component { //классы позволяют хранить �
     totalExpenses: 0, 
     totalBalance: 0,
     isSignedIn: JSON.parse(localStorage.getItem("expcalc:issignedin")),
-    userId: JSON.parse(localStorage.getItem("expcalc:currentuid")),
+    userId: '',
   }
 
   componentDidMount() { //componentDidMount вызывает функцию прямо перед началом рендеринга
-    this.getTransactions(JSON.parse(localStorage.getItem("expcalc:currentuid")));
+    this.getUser();
   } 
+
+  getUser() {
+    const accessToken = localStorage.getItem("expcalc:access_token");
+    
+    db.ref("users").orderByChild("userInfo/access_token").equalTo(accessToken).on('child_added', (snapshot) => {
+      if(snapshot.exists()) {
+        console.log(snapshot.val());
+        this.setState({
+          userId: snapshot.val().userInfo.uid,
+        }, () => {this.getTransactions(this.state.userId)});
+      }
+      else {
+        console.error('error')
+      }
+    })
+  }
 
   getTransactions(id) {
     const userRef = db.ref("users").child("user"+id);
@@ -37,7 +53,7 @@ class App extends Component { //классы позволяют хранить �
 
   //этот метод мы передаем в Operation
   addTransaction = add => {
-    let currentUID = JSON.parse(localStorage.getItem("expcalc:currentuid"));
+    let currentUID = this.state.userId;
     const transactions = [...this.state.transactions]; //... - spread-оператор
 
     transactions.push({ //пушим новую транзакцию
@@ -107,16 +123,16 @@ class App extends Component { //классы позволяют хранить �
   signOut = () => {
     this.setState({
       isSignedIn: false,
+      userId: '',
     }, () => firebase.auth().signOut())
     localStorage.setItem("expcalc:issignedin", "false");
   }
 
-  deleteTransaction = (id) => {
+  deleteTransaction = id => {
     //фильтруются только те элементы, у которых ключи не совпадают с тем который мы собираемся удалить
     const transactions = this.state.transactions.filter(item => item.id !== id);
     const userRef = db.ref("users").child("user"+this.state.userId);
  
-    console.log(this.state.userId);
     this.setState({transactions}, this.getTotalBalance);
     userRef.child("transactions").set(transactions);
   }

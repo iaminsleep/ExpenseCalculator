@@ -175,6 +175,7 @@ class App extends Component { //классы позволяют хранить �
       );
     }
     else {
+      localStorage.removeItem("expcalc:access_token");
       return(
         <React.Fragment> 
           <header>

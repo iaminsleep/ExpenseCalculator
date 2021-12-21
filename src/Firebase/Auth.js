@@ -39,12 +39,14 @@ const Auth = ({App}) => {
           isSignedIn: true,
         });
         localStorage.setItem("expcalc:issignedin", "true");
+        console.log('Успешный вход в систему');
       }
       else {
         App.setState({
           isSignedIn: false,
         });
         localStorage.setItem("expcalc:issignedin", "false");
+        console.error('Вы не вошли в систему! Попробуйте ещё раз');
       }
     });
   }
@@ -54,12 +56,12 @@ const Auth = ({App}) => {
       if(snapshot.exists()) {
         console.log('Пользователь найден в системе');
         db.ref("users").child("user"+id).update({userInfo}).catch(alert);
-        localStorage.setItem("expcalc:access_token", JSON.stringify(accessToken));
+        localStorage.setItem("expcalc:access_token", accessToken);
       }
       else {
         console.log('Добавлен новый пользователь');
         db.ref("users").child("user"+id).set({userInfo}).catch(alert);
-        localStorage.setItem("expcalc:access_token", JSON.stringify(accessToken));
+        localStorage.setItem("expcalc:access_token", accessToken);
       }
     });
   }

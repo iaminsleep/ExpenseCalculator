@@ -22,22 +22,21 @@ class App extends Component { //классы позволяют хранить �
     userId: '',
   }
 
-  componentDidMount() { //componentDidMount вызывает функцию прямо перед началом рендеринга
+  componentDidMount () {
     this.getUser();
-  } 
+  }
 
   getUser() {
     const accessToken = localStorage.getItem("expcalc:access_token");
     
     db.ref("users").orderByChild("userInfo/access_token").equalTo(accessToken).on('child_added', (snapshot) => {
       if(snapshot.exists()) {
-        console.log(snapshot.val());
         this.setState({
           userId: snapshot.val().userInfo.uid,
-        }, () => {this.getTransactions(this.state.userId)});
+        }, () => this.getTransactions(this.state.userId));
       }
       else {
-        console.error('error')
+        console.error('Возникла ошибка при получении данных!');
       }
     })
   }
@@ -46,7 +45,7 @@ class App extends Component { //классы позволяют хранить �
     const userRef = db.ref("users").child("user"+id);
     userRef.once('value', snapshot => {
         this.setState({
-          transactions: snapshot.val().transactions,
+          transactions: snapshot.val().transactions || [],
         }, () => this.getTotalBalance()) /* callback-функция (выполняется после setState) */
     });
   }
@@ -71,7 +70,9 @@ class App extends Component { //классы позволяют хранить �
     }, () => {
       this.addToStorage(currentUID);
       this.getTotalBalance();
-    })
+    });
+
+    console.log('Добавлена транзакция');
   }
 
   addAmount = e => { //это асинхронная функция
@@ -115,7 +116,7 @@ class App extends Component { //классы позволяют хранить �
         userRef.child("transactions").set(transactions);  
       }
       else {
-        console.error('error')
+        console.error('Возникла ошибка при получении данных!');
       }
     })
   }
@@ -126,6 +127,7 @@ class App extends Component { //классы позволяют хранить �
       userId: '',
     }, () => firebase.auth().signOut())
     localStorage.setItem("expcalc:issignedin", "false");
+    console.log('Выход из системы...');
   }
 
   deleteTransaction = id => {
@@ -135,6 +137,7 @@ class App extends Component { //классы позволяют хранить �
  
     this.setState({transactions}, this.getTotalBalance);
     userRef.child("transactions").set(transactions);
+    console.log('Транзакция удалена');
   }
 
   render() {

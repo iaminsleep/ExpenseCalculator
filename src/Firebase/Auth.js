@@ -26,8 +26,8 @@ const Auth = ({App}) => {
           userId: resID,
           access_token: accessToken,
         }, () => {
-          checkIfUserExists(resID, accessToken);       
-          checkIfSignedIn();
+          checkIfUserExists(resID);       
+          checkIfSignedIn(accessToken);
         });
         
       })
@@ -36,14 +36,15 @@ const Auth = ({App}) => {
       })
   }
 
-  const checkIfSignedIn = () => {
+  const checkIfSignedIn = (access_token) => {
     firebase.auth().onAuthStateChanged((user) => {
       if(user) {
+        console.log('Вход в систему');
         App.setState({
           isSignedIn: true,
         });
         localStorage.setItem("expcalc:issignedin", "true");
-        console.log('Вход в систему');
+        localStorage.setItem("expcalc:access_token", access_token);
       }
       else {
         App.setState({
@@ -55,20 +56,19 @@ const Auth = ({App}) => {
     });
   }
 
-  function checkIfUserExists(id, accessToken) {
+  function checkIfUserExists(id) {
     db.ref("users/").orderByChild("userInfo/uid").equalTo(id).once('value').then(snapshot => {
       if(snapshot.exists()) {
         console.log('Пользователь найден в системе');
 
         db.ref("users").child("user"+id).update({userInfo}).catch(alert);
-        localStorage.setItem("expcalc:access_token", accessToken);
       }
       else {
         console.log('Добавлен новый пользователь');
 
         db.ref("users").child("user"+id).set({userInfo}).catch(alert);
-        localStorage.setItem("expcalc:access_token", accessToken);
       }
+      window.location.reload();
     });
   }
 

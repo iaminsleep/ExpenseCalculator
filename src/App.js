@@ -18,7 +18,7 @@ class App extends Component { //классы позволяют хранить �
     totalIncome: 0, 
     totalExpenses: 0, 
     totalBalance: 0,
-    isSignedIn: localStorage.getItem("expcalc:issignedin") ? JSON.parse(localStorage.getItem("expcalc:issignedin")) : false,
+    isSignedIn: localStorage.getItem("expcalc:issignedin") && localStorage.getItem("expcalc:access_token") ? JSON.parse(localStorage.getItem("expcalc:issignedin")) : false,
     userId: '',
     access_token: localStorage.getItem("expcalc:access_token"),
   }
@@ -28,8 +28,8 @@ class App extends Component { //классы позволяют хранить �
   }
 
   getUser() {
-    const accessToken = this.state.access_token;
-    
+    const accessToken = this.state.access_token ? this.state.access_token : localStorage.getItem("expcalc:access_token");
+  
     db.ref("users").orderByChild("userInfo/access_token").equalTo(accessToken).on('child_added', (snapshot) => {
       if(snapshot.exists() && accessToken !== '') {
         this.setState({

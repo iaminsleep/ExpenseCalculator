@@ -22,10 +22,14 @@ const Auth = ({App}) => {
         userInfo.uid = resID;
         userInfo.access_token = accessToken;
 
-        checkIfUserExists(resID, accessToken);    
-        App.setState({userId: resID});
+        App.setState({
+          userId: resID,
+          access_token: accessToken,
+        }, () => {
+          checkIfUserExists(resID, accessToken);       
+          checkIfSignedIn();
+        });
         
-        checkIfSignedIn();
       })
       .catch((err) => {
         console.log(err);
@@ -39,7 +43,7 @@ const Auth = ({App}) => {
           isSignedIn: true,
         });
         localStorage.setItem("expcalc:issignedin", "true");
-        console.log('Успешный вход в систему');
+        console.log('Вход в систему');
       }
       else {
         App.setState({
@@ -55,11 +59,13 @@ const Auth = ({App}) => {
     db.ref("users/").orderByChild("userInfo/uid").equalTo(id).once('value').then(snapshot => {
       if(snapshot.exists()) {
         console.log('Пользователь найден в системе');
+
         db.ref("users").child("user"+id).update({userInfo}).catch(alert);
         localStorage.setItem("expcalc:access_token", accessToken);
       }
       else {
         console.log('Добавлен новый пользователь');
+
         db.ref("users").child("user"+id).set({userInfo}).catch(alert);
         localStorage.setItem("expcalc:access_token", accessToken);
       }

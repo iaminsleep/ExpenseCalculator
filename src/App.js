@@ -18,8 +18,9 @@ class App extends Component { //классы позволяют хранить �
     totalIncome: 0, 
     totalExpenses: 0, 
     totalBalance: 0,
-    isSignedIn: JSON.parse(localStorage.getItem("expcalc:issignedin")),
+    isSignedIn: localStorage.getItem("expcalc:issignedin") ? JSON.parse(localStorage.getItem("expcalc:issignedin")) : false,
     userId: '',
+    access_token: localStorage.getItem("expcalc:access_token"),
   }
 
   componentDidMount () {
@@ -27,16 +28,17 @@ class App extends Component { //классы позволяют хранить �
   }
 
   getUser() {
-    const accessToken = localStorage.getItem("expcalc:access_token");
+    const accessToken = this.state.access_token;
     
     db.ref("users").orderByChild("userInfo/access_token").equalTo(accessToken).on('child_added', (snapshot) => {
-      if(snapshot.exists()) {
+      if(snapshot.exists() && accessToken !== '') {
         this.setState({
           userId: snapshot.val().userInfo.uid,
         }, () => this.getTransactions(this.state.userId));
       }
       else {
-        console.error('Возникла ошибка при получении данных!');
+        console.error('Возникла ошибка при получении данных пользователя!');
+        this.signOut();
       }
     })
   }
@@ -60,7 +62,7 @@ class App extends Component { //классы позволяют хранить �
       id: `cmr${(+new Date()).toString(16)}key`, //+ перед new Date нужен чтобы дата сразу переводилась в число. 16 переводит число в шестнадцатеричную систему
       description: this.state.description,
       moneyAmount: this.state.moneyAmount,
-      add
+      add,
     });
 
     this.setState({ //почему везде пишется this? потому что эти функции и объекты находятся в одном классе (App)
@@ -71,8 +73,6 @@ class App extends Component { //классы позволяют хранить �
       this.addToStorage(currentUID);
       this.getTotalBalance();
     });
-
-    console.log('Добавлена транзакция');
   }
 
   addAmount = e => { //это асинхронная функция
@@ -112,8 +112,9 @@ class App extends Component { //классы позволяют хранить �
     db.ref("users").orderByChild("userInfo/uid").equalTo(id).once('value').then(snapshot => {
       if(snapshot.exists()) {
         const userRef = db.ref("users").child("user"+id);
-
         userRef.child("transactions").set(transactions);  
+
+        console.log('Добавлена транзакция');
       }
       else {
         console.error('Возникла ошибка при получении данных!');
@@ -180,7 +181,9 @@ class App extends Component { //классы позволяют хранить �
             <h1>Кошелек</h1>
             <h2>Калькулятор расходов</h2>
           </header>
-          <Auth App={this}/> 
+          <Auth 
+            App={this}
+          /> 
         </React.Fragment>
       )
     }

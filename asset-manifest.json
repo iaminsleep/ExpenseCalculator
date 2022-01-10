@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/ExpenseCalculator/static/css/main.3b80e156.css",
-    "main.js": "/ExpenseCalculator/static/js/main.c65ed506.js",
+    "main.css": "/ExpenseCalculator/static/css/main.b79d5a38.css",
+    "main.js": "/ExpenseCalculator/static/js/main.7147df84.js",
     "index.html": "/ExpenseCalculator/index.html",
-    "main.3b80e156.css.map": "/ExpenseCalculator/static/css/main.3b80e156.css.map",
-    "main.c65ed506.js.map": "/ExpenseCalculator/static/js/main.c65ed506.js.map"
+    "main.b79d5a38.css.map": "/ExpenseCalculator/static/css/main.b79d5a38.css.map",
+    "main.7147df84.js.map": "/ExpenseCalculator/static/js/main.7147df84.js.map"
   },
   "entrypoints": [
-    "static/css/main.3b80e156.css",
-    "static/js/main.c65ed506.js"
+    "static/css/main.b79d5a38.css",
+    "static/js/main.7147df84.js"
   ]
 }

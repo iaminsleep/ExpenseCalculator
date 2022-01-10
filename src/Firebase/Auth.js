@@ -73,7 +73,7 @@ const Auth = ({App}) => {
   }
 
   return (
-    <button onClick={SignInWithFirebase}>Войти</button>
+    <button className="btn-auth" onClick={SignInWithFirebase}>Войти с помощью Github</button>
   )
 }
 

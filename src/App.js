@@ -28,7 +28,7 @@ class App extends Component { //классы позволяют хранить �
   }
 
   getUser() {
-    const accessToken = this.state.access_token ? this.state.access_token : localStorage.getItem("expcalc:access_token");
+    const accessToken = this.state.access_token;
   
     db.ref("users").orderByChild("userInfo/access_token").equalTo(accessToken).on('child_added', (snapshot) => {
       if(snapshot.exists() && accessToken !== '') {
@@ -128,6 +128,7 @@ class App extends Component { //классы позволяют хранить �
       userId: '',
     }, () => firebase.auth().signOut())
     localStorage.setItem("expcalc:issignedin", "false");
+    localStorage.removeItem("expcalc:access_token");
     console.log('Выход из системы...');
   }
 
@@ -146,9 +147,12 @@ class App extends Component { //классы позволяют хранить �
       return (
         /*эти треугольные скобки могут быть пустыми, т.к по умолчанию и так стоит React.Fragment*/
         <React.Fragment> 
-          <header>
-            <h1>Кошелек</h1>
-            <h2>Калькулятор расходов</h2>
+          <header className="flex">
+            <div>
+              <h1>Кошелек</h1>
+              <h2>Калькулятор расходов</h2>
+            </div>
+            <button className="btn-auth fixed-button" onClick={this.signOut}>Выйти</button>
           </header>
           <main>
               <div className="container">
@@ -168,7 +172,6 @@ class App extends Component { //классы позволяют хранить �
                     description={this.state.description}
                     moneyAmount={this.state.moneyAmount}
                   />
-                  <button onClick={this.signOut}>Выйти</button>
               </div>
           </main>
         </React.Fragment>

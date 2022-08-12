@@ -1,12 +1,12 @@
-# Приложение "Калькулятор расходов" на React JS
+# The "Expense Calculator" application on React JS
 
-Удобное приложение для быстрого подсчёта расходов
+Convenient application for quick calculation of expenses
 
-### Особенности
-- авторизация через Github
-- все транзакции сохраняются в realtime базу данных и подгружаются при каждом входе в приложение
-- минималистичный дизайн, который не будет напрягать глаза ночью
+### Features
+- authorization via Github
+- all transactions are saved to the realtime database and loaded every time you log in to the application
+- minimalistic design that won't strain your eyes at night
 
-### Хостинг
-Приложение использует хостинг от Firebase с SSL-сертификатом</br>
+### Hosting
+The application uses Firebase hosting with an SSL certificate</br>
 https://expensecalculator-1ca6a.web.app/
